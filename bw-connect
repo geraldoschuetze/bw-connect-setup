@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# bw-connect — desbloqueia o Bitwarden e salva a sessão em /tmp/.bw_session
+# Uso: bw-connect   (digite a senha master quando solicitado)
+#
+# A senha é digitada de forma OCULTA (prompt do bw vai para stderr); `--raw`
+# imprime APENAS o token de sessão, que é gravado direto no arquivo — sem
+# copiar/colar manual. A senha nunca toca o disco nem aparece em output.
+
+set -uo pipefail
+SESSION_FILE="/tmp/.bw_session"
+
+# 1. Precisa estar logado (unlock falha se a conta estiver deslogada)
+status="$(bw status 2>/dev/null \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status","unauthenticated"))' 2>/dev/null \
+  || echo unauthenticated)"
+if [ "$status" = "unauthenticated" ]; then
+  echo "⛔ Você não está logado no Bitwarden. Rode primeiro:  bw login" >&2
+  exit 1
+fi
+
+# 2. Desbloqueia e captura só o token (prompt da senha aparece no terminal)
+TOKEN="$(bw unlock --raw)"
+rc=$?
+if [ $rc -ne 0 ] || [ -z "${TOKEN:-}" ]; then
+  echo "❌ Falha ao desbloquear o Bitwarden (senha incorreta?)." >&2
+  exit 1
+fi
+
+# 3. Grava a sessão com permissão restrita e descarta o token da memória
+printf '%s' "$TOKEN" > "$SESSION_FILE"
+chmod 600 "$SESSION_FILE"
+unset TOKEN
+
+echo "✅ Bitwarden conectado"
