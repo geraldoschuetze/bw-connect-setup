@@ -8,6 +8,7 @@ Sem copiar/colar token, sem senha no histórico do shell, sem segredo gravado em
 $ bw-connect
 ? Master password: [hidden]
 ✅ Bitwarden conectado
+   Sessão: /run/user/1000/bw_session
 ```
 
 ## Índice
@@ -34,7 +35,7 @@ bw unlock
 #   copiar e colar manualmente em cada terminal
 ```
 
-O `bw-connect` transforma isso em um comando só: desbloqueia o cofre, captura o token de sessão via `--raw` e o grava em `/tmp/.bw_session` com permissão `600`. Qualquer processo seu (outros terminais, scripts, Claude Code) passa a usar a mesma sessão.
+O `bw-connect` transforma isso em um comando só: desbloqueia o cofre, captura o token de sessão via `--raw` e o grava no seu diretório de runtime com permissão `600`. Qualquer processo seu (outros terminais, scripts, Claude Code) passa a usar a mesma sessão.
 
 ## ⚙️ Como funciona
 
@@ -46,22 +47,29 @@ O `bw-connect` transforma isso em um comando só: desbloqueia o cofre, captura o
        │              token de sessão            │
        │ ◄───────────────────────────────────────┘
        ▼
-  /tmp/.bw_session  (chmod 600 — só seu usuário lê)
+  $XDG_RUNTIME_DIR/bw_session  (chmod 600, em diretório drwx------)
 ```
 
 Passo a passo do script ([`bw-connect`](bw-connect)):
 
 1. **Verifica o login** — `bw status`; se a conta estiver deslogada, orienta a rodar `bw login` primeiro
-2. **Desbloqueia** — `bw unlock --raw` pede a senha master em prompt **oculto** (o prompt vai para stderr; stdout contém apenas o token)
-3. **Persiste a sessão** — grava o token em `/tmp/.bw_session`, aplica `chmod 600` e descarta a variável da memória
+2. **Descarta a sessão anterior** — assim nunca sobra um token velho se passando por sessão atual caso o desbloqueio falhe
+3. **Desbloqueia** — `bw unlock --raw` pede a senha master em prompt **oculto** (o prompt vai para stderr; stdout contém apenas o token)
+4. **Persiste a sessão** — grava o token de forma atômica (temporário + `mv`) com `umask 077`, de modo que o arquivo já nasce restrito e nunca existe em estado truncado
 
-A senha master **nunca** toca o disco nem aparece em nenhum output. Só o token de sessão (temporário e revogável) é gravado — e em `/tmp`, que é apagado a cada reinicialização.
+A senha master **nunca** toca o disco nem aparece em nenhum output. Só o token de sessão (temporário e revogável) é gravado.
+
+### Onde a sessão fica
+
+O arquivo vai para `$XDG_RUNTIME_DIR/bw_session` — um diretório privado por usuário (`drwx------`), que o sistema apaga automaticamente no logout. Em sistemas sem `XDG_RUNTIME_DIR` (macOS, alguns containers), o script cai para `/tmp/.bw_session-$UID`.
+
+Você nunca precisa decorar o caminho: `bw-connect --path` imprime qual está em uso.
 
 ## 📦 O que tem neste repositório
 
 | Arquivo | O que é |
 |---|---|
-| [`bw-connect`](bw-connect) | O script em si (~35 linhas de bash) |
+| [`bw-connect`](bw-connect) | O script em si |
 | [`install.sh`](install.sh) | Instalador automático |
 | `README.md` | Este guia |
 
@@ -84,11 +92,11 @@ O `install.sh` verifica tudo isso e mostra as instruções se algo faltar.
 ### 1. Clone o repositório
 
 ```bash
-git clone git@github.com:geraldoschuetze/bw-connect-setup.git
+git clone https://github.com/geraldoschuetze/bw-connect-setup.git
 cd bw-connect-setup
 ```
 
-*(Sem acesso ao repo? A pasta também pode ser levada por pendrive ou drive — não há segredos nela.)*
+> 🔍 **Leia antes de executar.** São ~70 linhas de bash entre os dois arquivos, e eles participam do desbloqueio do seu cofre. Abra o [`bw-connect`](bw-connect) e o [`install.sh`](install.sh) e confira o que fazem — vale mais do que qualquer selo de verificação.
 
 ### 2. Rode o instalador
 
@@ -100,7 +108,7 @@ O instalador faz exatamente três coisas (e nada além disso):
 
 1. Verifica os pré-requisitos (`bw`, `python3`) — se faltar algo, mostra como instalar e para
 2. Copia o script para `~/.local/bin/bw-connect` (com `install -m 755`)
-3. Garante que `~/.local/bin` está no `PATH` (adiciona ao `~/.bashrc`/`~/.zshrc` se preciso)
+3. Garante que `~/.local/bin` está no `PATH` (adiciona ao `~/.bashrc`/`~/.zshrc` conforme o seu `$SHELL`, sem duplicar se já existir)
 
 ### 3. Login (só na primeira vez em cada máquina)
 
@@ -121,24 +129,30 @@ Digite a senha master quando pedir (fica **oculta** enquanto você digita). Ao v
 A partir daí, em qualquer terminal:
 
 ```bash
-BW_SESSION=$(cat /tmp/.bw_session) bw get password "nome-do-item"
-BW_SESSION=$(cat /tmp/.bw_session) bw list items --search "postgres"
+BW_SESSION=$(cat "$(bw-connect --path)") bw get password "nome-do-item"
+BW_SESSION=$(cat "$(bw-connect --path)") bw list items --search "postgres"
+```
+
+Ou exporte uma vez no terminal atual:
+
+```bash
+export BW_SESSION=$(cat "$(bw-connect --path)")
 ```
 
 Para encerrar a sessão manualmente:
 
 ```bash
-bw lock && rm -f /tmp/.bw_session
+bw lock && rm -f "$(bw-connect --path)"
 ```
 
-A sessão também morre sozinha ao reiniciar o computador (o `/tmp` é limpo no boot).
+A sessão também some sozinha quando você faz logout do sistema (o `$XDG_RUNTIME_DIR` é apagado junto).
 
 ## 🤖 Uso com o Claude Code
 
 Depois de rodar `bw-connect` num terminal comum, o Claude Code consegue usar a sessão nos comandos `bw`:
 
 ```bash
-BW_SESSION=$(cat /tmp/.bw_session) bw get password "nome-do-item"
+BW_SESSION=$(cat "$(bw-connect --path)") bw get password "nome-do-item"
 ```
 
 Se o cofre travar no meio de uma sessão do Claude, rode `! bw-connect` direto no prompt do Claude — o `!` executa o comando no seu terminal e mostra o resultado na conversa.
@@ -148,13 +162,15 @@ Se o cofre travar no meio de uma sessão do Claude, rode `! bw-connect` direto n
 **Como o script protege suas credenciais:**
 
 - A senha master é digitada em prompt oculto e **nunca é gravada em disco nem aparece em nenhum output**
-- O token de sessão fica em `/tmp/.bw_session` com permissão `600` (só o seu usuário lê)
-- O `/tmp` é apagado a cada reinicialização — a sessão morre junto
+- O token fica em `$XDG_RUNTIME_DIR`, um diretório privado do seu usuário (`drwx------`) — outros usuários da máquina não conseguem nem listar o conteúdo
+- A gravação usa `umask 077` e escrita atômica: o arquivo já **nasce** com permissão `600`, sem janela em que fique legível por terceiros
+- O `$XDG_RUNTIME_DIR` é apagado no logout — a sessão morre junto
 - O token é revogável a qualquer momento com `bw lock`
+- Se o desbloqueio falhar, a sessão anterior é removida: nunca sobra um token velho se passando por sessão válida
 
 **Nunca faça:**
 
-- ❌ Copiar `/tmp/.bw_session` para outro computador ou para dentro deste repositório — ele é um token de acesso ao seu cofre
+- ❌ Copiar o arquivo de sessão para outro computador ou para dentro deste repositório — ele é um token de acesso ao seu cofre
 - ❌ Passar a senha master por argumento de linha de comando (ficaria no histórico do shell)
 - ❌ Instalar o `bw` de fontes não oficiais
 
@@ -179,7 +195,7 @@ bw status
 
 ### `bw-connect: command not found`
 
-O `~/.local/bin` ainda não está no `PATH` deste terminal. Abra um **novo** terminal (o instalador atualiza o `~/.bashrc`, que só é lido em sessões novas) ou rode:
+O `~/.local/bin` ainda não está no `PATH` deste terminal. Abra um **novo** terminal (o instalador atualiza o rc do seu shell, que só é lido em sessões novas) ou rode:
 
 ```bash
 export PATH="$HOME/.local/bin:$PATH"
@@ -190,10 +206,8 @@ export PATH="$HOME/.local/bin:$PATH"
 Falta passar a sessão pro comando:
 
 ```bash
-BW_SESSION=$(cat /tmp/.bw_session) bw get password "item"
+BW_SESSION=$(cat "$(bw-connect --path)") bw get password "item"
 ```
-
-Ou exporte uma vez no terminal atual: `export BW_SESSION=$(cat /tmp/.bw_session)`
 
 ### Sessão expirou / cofre travou de novo
 
@@ -202,6 +216,8 @@ Normal — o Bitwarden trava o cofre após timeout ou reinicialização. Basta r
 ## 🗑️ Desinstalação
 
 ```bash
-rm -f ~/.local/bin/bw-connect /tmp/.bw_session
+rm -f ~/.local/bin/bw-connect "$(bw-connect --path)"
 bw lock   # opcional: trava o cofre
 ```
+
+(Se já removeu o script e precisa achar a sessão: ela está em `$XDG_RUNTIME_DIR/bw_session` ou `/tmp/.bw_session-$(id -u)`.)

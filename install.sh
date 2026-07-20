@@ -54,10 +54,20 @@ case ":$PATH:" in
     echo "✅ $DEST já está no PATH"
     ;;
   *)
-    SHELL_RC="$HOME/.bashrc"
-    [ -n "${ZSH_VERSION:-}" ] && SHELL_RC="$HOME/.zshrc"
-    echo "export PATH=\"\$HOME/.local/bin:\$PATH\"" >> "$SHELL_RC"
-    echo "✅ PATH atualizado em $SHELL_RC (abra um novo terminal para valer)"
+    # O shell de LOGIN vem de $SHELL — não de $ZSH_VERSION, que nunca está
+    # definida aqui dentro (este script roda sob bash). Escrever no ~/.bashrc
+    # de quem usa zsh deixaria o PATH quebrado em silêncio.
+    case "${SHELL:-}" in
+      */zsh) SHELL_RC="$HOME/.zshrc" ;;
+      *)     SHELL_RC="$HOME/.bashrc" ;;
+    esac
+    PATH_LINE='export PATH="$HOME/.local/bin:$PATH"'
+    if [ -f "$SHELL_RC" ] && grep -qF "$PATH_LINE" "$SHELL_RC"; then
+      echo "✅ $SHELL_RC já exporta $DEST (abra um novo terminal para valer)"
+    else
+      printf '%s\n' "$PATH_LINE" >> "$SHELL_RC"
+      echo "✅ PATH atualizado em $SHELL_RC (abra um novo terminal para valer)"
+    fi
     ;;
 esac
 
