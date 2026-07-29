@@ -10,7 +10,8 @@ Sem copiar/colar token, sem senha no histórico do shell, sem segredo gravado em
 $ bw-connect
 ? Master password: [hidden]
 ✅ Bitwarden conectado
-   Sessão: /run/user/1000/bw_session
+   Sessão:    /run/user/1000/bw_session
+   Auto-lock: em 3h
 ```
 
 ## Índice
@@ -41,16 +42,10 @@ O `bw-connect` transforma isso em um comando só: desbloqueia o cofre, captura o
 
 ## ⚙️ Como funciona
 
-```
-┌─────────────┐   senha (prompt oculto)   ┌──────────────┐
-│  bw-connect │ ────────────────────────► │  bw unlock   │
-└─────────────┘                           │    --raw     │
-       │                                  └──────┬───────┘
-       │              token de sessão            │
-       │ ◄───────────────────────────────────────┘
-       ▼
-  $XDG_RUNTIME_DIR/bw_session  (chmod 600, em diretório drwx------)
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/bwflow-pt-dark.svg">
+  <img alt="O que um bw-connect faz: o install.sh põe o script no PATH e o bw login roda uma vez por máquina; cada desbloqueio então confere o bw status, roda bw unlock --raw atrás de um prompt oculto e grava o token de forma atômica sob umask 077 em $XDG_RUNTIME_DIR/bw_session com modo 600, pronto para seus terminais e o Claude Code." src="docs/img/bwflow-pt-light.svg" width="100%">
+</picture>
 
 Passo a passo do script ([`bw-connect`](bw-connect)):
 
@@ -185,6 +180,12 @@ BW_SESSION=$(cat "$(bw-connect --path)") bw get password "nome-do-item"
 Se o cofre travar no meio de uma sessão do Claude, rode `! bw-connect` direto no prompt do Claude — o `!` executa o comando no seu terminal e mostra o resultado na conversa.
 
 ## 🔒 Segurança
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/bwlife-pt-dark.svg">
+  <img alt="A vida da sessão: o token fica em $XDG_RUNTIME_DIR/bw_session com modo 600, protegido por umask 077, escrita atômica, um diretório privado drwx------ e pela remoção da sessão anterior quando um unlock falha; termina pelo auto-lock, por um bw lock explícito, ou pelo logout. Enquanto está viva, qualquer processo seu lê o cofre inteiro." src="docs/img/bwlife-pt-light.svg" width="100%">
+</picture>
+
 
 **Como o script protege suas credenciais:**
 
