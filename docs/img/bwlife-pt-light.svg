@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600" width="1280" height="600" role="img" aria-label="A vida da sessão. O token fica em $XDG_RUNTIME_DIR/bw_session com modo 600. É protegido por umask 077, escrita atômica, um diretório privado drwx------ e pela remoção da sessão anterior quando um unlock falha. Ele termina pelo auto-lock após três horas por padrão, por um bw lock explícito, ou pelo logout. O trade-off é explícito: enquanto a sessão está viva, qualquer processo rodando como o seu usuário lê o cofre inteiro sem senha.">
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8c959f"/></marker>
+</defs>
+<rect width="1280" height="600" fill="none"/>
+<text x="28" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1" fill="#1FA97F">A VIDA DA SESSÃO · O QUE PROTEGE O TOKEN, E O QUE O ENCERRA</text>
+<rect x="440" y="70" width="400" height="108" rx="8" fill="#ffffff" stroke="#d1d9e0" stroke-width="1"/>
+<path d="M441 79 a8 8 0 0 1 8-8 h0 v106 h0 a8 8 0 0 1-8-8 Z" fill="#1FA97F"/>
+<text x="458" y="100" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace" font-size="18" font-weight="600" fill="#1f2328">bw_session</text>
+<text x="458" y="123" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#59636e">$XDG_RUNTIME_DIR/bw_session</text>
+<text x="458" y="143" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#59636e">modo 600 — um token, não a sua senha master</text>
+<rect x="28" y="246" width="592" height="140" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1"/>
+<path d="M29 255 a8 8 0 0 1 8-8 h0 v138 h0 a8 8 0 0 1-8-8 Z" fill="#1FA97F"/>
+<text x="46" y="276" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#1f2328">O que protege</text>
+<text x="46" y="299" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">umask 077 — o arquivo nasce 600, sem janela em que seja legível</text>
+<text x="46" y="319" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">escrita atômica (mktemp + mv) — nunca truncado, nunca ausente</text>
+<text x="46" y="339" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">$XDG_RUNTIME_DIR é drwx------ — outros usuários nem conseguem listar</text>
+<text x="46" y="359" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">unlock que falha apaga a sessão anterior, então não sobra token velho</text>
+<rect x="660" y="246" width="592" height="140" rx="8" fill="#f6f8fa" stroke="#d1d9e0" stroke-width="1"/>
+<path d="M661 255 a8 8 0 0 1 8-8 h0 v138 h0 a8 8 0 0 1-8-8 Z" fill="#d29922"/>
+<text x="678" y="276" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#1f2328">O que encerra</text>
+<text x="678" y="299" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">auto-lock — 3h por padrão, e a contagem reinicia a cada bw-connect</text>
+<text x="678" y="319" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">BW_AUTOLOCK=30min · 1d · off  (precisa do systemd de usuário)</text>
+<text x="678" y="339" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">bw lock — revoga o token na hora</text>
+<text x="678" y="359" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#59636e">logout — o $XDG_RUNTIME_DIR é apagado, e a sessão junto</text>
+<path d="M560 178 C480 200 380 220 324 242" fill="none" stroke="#8c959f" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M720 178 C800 200 900 220 956 242" fill="none" stroke="#8c959f" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="28" y="430" width="1224" height="140" rx="8" fill="#f6f8fa" stroke="#cf222e" stroke-width="1.2"/>
+<path d="M29 439 a8 8 0 0 1 8-8 h0 v138 h0 a8 8 0 0 1-8-8 Z" fill="#cf222e"/>
+<text x="48" y="462" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="17" font-weight="600" fill="#1f2328">Enquanto a sessão está viva, qualquer processo seu consegue ler o cofre inteiro</text>
+<text x="48" y="488" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#59636e">· sem senha nenhuma — basta ler o arquivo de sessão</text>
+<text x="48" y="510" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#59636e">· isso inclui dependências, extensões do editor e scripts que você rodar nessa janela</text>
+<text x="48" y="532" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#59636e">· as proteções acima barram outros usuários da máquina, não código rodando como você</text>
+<text x="48" y="556" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#1f2328">Em máquina compartilhada, servidor ou CI, prefira um bw unlock avulso por operação.</text>
+</svg>
