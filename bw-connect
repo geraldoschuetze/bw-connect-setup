@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# bw-connect — desbloqueia o Bitwarden e salva a sessão no diretório de runtime do usuário
+# Uso: bw-connect          (digite a senha master quando solicitado)
+#      bw-connect --path   (imprime o caminho do arquivo de sessão e sai)
+#
+# A senha é digitada de forma OCULTA (prompt do bw vai para stderr); `--raw`
+# imprime APENAS o token de sessão, que é gravado direto no arquivo — sem
+# copiar/colar manual. A senha nunca toca o disco nem aparece em output.
+
+set -uo pipefail
+
+# Toda escrita nasce com permissão restrita (fecha a janela entre criar e chmod)
+umask 077
+
+# A sessão vai para $XDG_RUNTIME_DIR — um diretório por usuário, drwx------, que
+# o sistema apaga no logout. O fallback em /tmp leva o UID no nome para não
+# colidir com outro usuário da máquina.
+if [ -n "${XDG_RUNTIME_DIR:-}" ] && [ -d "$XDG_RUNTIME_DIR" ]; then
+  SESSION_FILE="$XDG_RUNTIME_DIR/bw_session"
+else
+  SESSION_FILE="/tmp/.bw_session-$(id -u)"
+fi
+
+# `--path` existe para os consumidores não repetirem a lógica acima:
+#   BW_SESSION=$(cat "$(bw-connect --path)") bw get password "item"
+if [ "${1:-}" = "--path" ]; then
+  printf '%s\n' "$SESSION_FILE"
+  exit 0
+fi
+
+# 1. Precisa estar logado (unlock falha se a conta estiver deslogada)
+status="$(bw status 2>/dev/null \
+  | python3 -c 'import json,sys; print(json.load(sys.stdin).get("status","unauthenticated"))' 2>/dev/null \
+  || echo unauthenticated)"
+if [ "$status" = "unauthenticated" ]; then
+  echo "⛔ Você não está logado no Bitwarden. Rode primeiro:  bw login" >&2
+  exit 1
+fi
+
+# 2. Desbloqueia e captura só o token (prompt da senha aparece no terminal)
+#
+#    A sessão anterior é preservada durante o unlock: quem estiver lendo o
+#    arquivo a cada comando continua funcionando enquanto a senha é digitada.
+#    Ela só é descartada se o unlock FALHAR — aí não pode sobrar um token velho
+#    se passando por sessão atual. No sucesso, o mv atômico lá embaixo troca o
+#    arquivo sem nenhum instante de ausência.
+TOKEN="$(bw unlock --raw)"
+rc=$?
+if [ $rc -ne 0 ] || [ -z "${TOKEN:-}" ]; then
+  rm -f "$SESSION_FILE"
+  echo "❌ Falha ao desbloquear o Bitwarden (senha incorreta?)." >&2
+  exit 1
+fi
+
+# 3. Grava de forma atômica: escreve num temporário no mesmo diretório e só
+#    então renomeia. Nunca existe arquivo de sessão truncado, e qualquer falha
+#    de escrita aborta com erro em vez de anunciar sucesso.
+TMP_FILE="$(mktemp "${SESSION_FILE}.XXXXXX")" || {
+  echo "❌ Não foi possível criar arquivo temporário em $(dirname "$SESSION_FILE")" >&2
+  exit 1
+}
+if ! printf '%s' "$TOKEN" > "$TMP_FILE"; then
+  rm -f "$TMP_FILE"
+  echo "❌ Não foi possível gravar a sessão em $SESSION_FILE" >&2
+  exit 1
+fi
+chmod 600 "$TMP_FILE"
+if ! mv -f "$TMP_FILE" "$SESSION_FILE"; then
+  rm -f "$TMP_FILE"
+  echo "❌ Não foi possível salvar a sessão em $SESSION_FILE" >&2
+  exit 1
+fi
+unset TOKEN   # remove o nome do escopo (não zera a memória do processo)
+
+# 4. Agenda o auto-lock. Sem isso a sessão vale até o reboot: o Bitwarden CLI
+#    não tem timeout de inatividade (vaultTimeout = never), então o token
+#    ficaria legível por qualquer processo seu por dias. O timer é transitório
+#    e é reagendado a cada bw-connect, reiniciando a contagem.
+#
+#    Ajuste com BW_AUTOLOCK (formato de tempo do systemd: 30min, 3h, 1d) ou
+#    desative com BW_AUTOLOCK=off.
+AUTOLOCK="${BW_AUTOLOCK:-3h}"
+autolock_status="desativado"
+
+if [ "$AUTOLOCK" != "off" ] && command -v systemd-run >/dev/null 2>&1; then
+  # O caminho do bw é resolvido agora porque o systemd não herda o seu PATH
+  # (aqui ele vem do nvm, que não existe no ambiente do serviço).
+  BW_BIN="$(command -v bw)"
+  systemctl --user stop bw-autolock.timer bw-autolock.service >/dev/null 2>&1
+  if systemd-run --user --quiet --collect --unit=bw-autolock \
+       --on-active="$AUTOLOCK" \
+       /bin/sh -c "$(printf '%q lock >/dev/null 2>&1; rm -f %q' "$BW_BIN" "$SESSION_FILE")" \
+       >/dev/null 2>&1; then
+    autolock_status="em $AUTOLOCK"
+  else
+    autolock_status="⚠️  falhou ao agendar — a sessão vai durar até o reboot"
+  fi
+elif [ "$AUTOLOCK" != "off" ]; then
+  autolock_status="⚠️  indisponível (sem systemd) — a sessão vai durar até o reboot"
+fi
+
+echo "✅ Bitwarden conectado"
+echo "   Sessão:    $SESSION_FILE"
+echo "   Auto-lock: $autolock_status"
