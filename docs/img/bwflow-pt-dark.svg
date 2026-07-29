@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 600" width="1280" height="600" role="img" aria-label="O que um bw-connect faz: o install.sh põe o script no PATH e o bw login roda uma vez por máquina; daí cada desbloqueio confere o bw status, roda bw unlock --raw atrás de um prompt oculto e grava o token de forma atômica sob umask 077 em $XDG_RUNTIME_DIR/bw_session com modo 600, pronto para seus terminais e o Claude Code.">
+<defs>
+<marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6e7681"/></marker>
+</defs>
+<rect width="1280" height="600" fill="none"/>
+<text x="28" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1" fill="#8957e5">UMA VEZ POR MÁQUINA</text>
+<text x="340" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1" fill="#175DDC">A CADA DESBLOQUEIO · bw-connect</text>
+<text x="712" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1" fill="#1FA97F">A SESSÃO</text>
+<text x="1000" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" letter-spacing="1" fill="#20A7C9">QUEM USA</text>
+<rect x="28" y="80" width="250" height="118" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M29 89 a8 8 0 0 1 8-8 h0 v116 h0 a8 8 0 0 1-8-8 Z" fill="#8957e5"/>
+<text x="46" y="110" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace" font-size="18" font-weight="600" fill="#e6edf3">install.sh</text>
+<text x="46" y="133" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">confere bw + python3</text>
+<text x="46" y="153" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">copia p/ ~/.local/bin</text>
+<text x="46" y="173" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">põe no seu PATH</text>
+<rect x="28" y="230" width="250" height="86" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M29 239 a8 8 0 0 1 8-8 h0 v84 h0 a8 8 0 0 1-8-8 Z" fill="#8957e5"/>
+<text x="46" y="260" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace" font-size="18" font-weight="600" fill="#e6edf3">bw login</text>
+<text x="46" y="283" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">e-mail + senha master</text>
+<rect x="28" y="380" width="250" height="118" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M29 389 a8 8 0 0 1 8-8 h0 v116 h0 a8 8 0 0 1-8-8 Z" fill="#cf222e"/>
+<text x="46" y="410" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="600" fill="#e6edf3">Se falhar</text>
+<text x="46" y="433" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">deslogado → rode bw login</text>
+<text x="46" y="453" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">senha errada → a sessão</text>
+<text x="46" y="473" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">anterior é removida</text>
+<rect x="340" y="80" width="310" height="96" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M341 89 a8 8 0 0 1 8-8 h0 v94 h0 a8 8 0 0 1-8-8 Z" fill="#175DDC"/>
+<text x="358" y="110" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace" font-size="18" font-weight="600" fill="#e6edf3">1 · bw status</text>
+<text x="358" y="133" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">a conta está logada?</text>
+<rect x="340" y="208" width="310" height="118" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M341 217 a8 8 0 0 1 8-8 h0 v116 h0 a8 8 0 0 1-8-8 Z" fill="#175DDC"/>
+<text x="358" y="238" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace" font-size="18" font-weight="600" fill="#e6edf3">2 · bw unlock --raw</text>
+<text x="358" y="261" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">prompt oculto → stderr</text>
+<text x="358" y="281" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">token → só no stdout</text>
+<text x="358" y="301" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">senha nunca toca o disco</text>
+<rect x="340" y="358" width="310" height="118" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M341 367 a8 8 0 0 1 8-8 h0 v116 h0 a8 8 0 0 1-8-8 Z" fill="#175DDC"/>
+<text x="358" y="388" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="600" fill="#e6edf3">3 · escrita atômica</text>
+<text x="358" y="411" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">umask 077 · mktemp · chmod 600</text>
+<text x="358" y="431" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">e então mv -f no lugar</text>
+<text x="358" y="451" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">nunca truncado, nunca ausente</text>
+<rect x="712" y="150" width="252" height="160" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M713 159 a8 8 0 0 1 8-8 h0 v158 h0 a8 8 0 0 1-8-8 Z" fill="#1FA97F"/>
+<text x="730" y="180" font-family="ui-monospace, SFMono-Regular, 'SF Mono', Menlo, monospace" font-size="18" font-weight="600" fill="#e6edf3">bw_session</text>
+<text x="730" y="203" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">$XDG_RUNTIME_DIR/</text>
+<text x="730" y="223" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">modo 600, em dir drwx------</text>
+<text x="730" y="243" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">apagado no logout</text>
+<rect x="712" y="350" width="252" height="110" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1" stroke-dasharray="5 4"/>
+<path d="M713 359 a8 8 0 0 1 8-8 h0 v108 h0 a8 8 0 0 1-8-8 Z" fill="#1FA97F"/>
+<text x="730" y="380" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="600" fill="#e6edf3">fallback</text>
+<text x="730" y="403" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">/tmp/.bw_session-$UID</text>
+<text x="730" y="423" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">só sem XDG_RUNTIME_DIR</text>
+<rect x="1000" y="150" width="252" height="160" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M1001 159 a8 8 0 0 1 8-8 h0 v158 h0 a8 8 0 0 1-8-8 Z" fill="#20A7C9"/>
+<text x="1018" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="600" fill="#e6edf3">seus terminais</text>
+<text x="1018" y="203" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">bw-connect --path imprime</text>
+<text x="1018" y="223" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">o caminho em uso</text>
+<text x="1018" y="243" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">nunca copiar e colar</text>
+<rect x="1000" y="350" width="252" height="110" rx="8" fill="#151b23" stroke="#3d444d" stroke-width="1"/>
+<path d="M1001 359 a8 8 0 0 1 8-8 h0 v108 h0 a8 8 0 0 1-8-8 Z" fill="#20A7C9"/>
+<text x="1018" y="380" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="19" font-weight="600" fill="#e6edf3">Claude Code</text>
+<text x="1018" y="403" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">mesma sessão · ! bw-connect</text>
+<text x="1018" y="423" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">p/ redesbloquear inline</text>
+<path d="M154 198 L154 226" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M278 273 C310 273 312 140 336 130" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M494 176 L494 204" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M494 326 L494 354" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M650 417 C680 417 684 250 708 232" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M964 230 L996 230" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M838 310 L838 346" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M1126 310 L1126 346" fill="none" stroke="#6e7681" stroke-width="1.6" marker-end="url(#ah)"/>
+<path d="M336 150 C304 168 294 372 282 408" fill="none" stroke="#6e7681" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+<path d="M336 300 C312 328 296 400 282 436" fill="none" stroke="#6e7681" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#ah)"/>
+<rect x="28" y="524" width="1224" height="44" rx="7" fill="#0f141a" stroke="#2f363d" stroke-width="1"/>
+<text x="640" y="551" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="14" fill="#9198a1">A senha master é digitada num prompt oculto e nunca toca o disco — só o token de sessão, temporário e revogável, chega a ser gravado.</text>
+</svg>
