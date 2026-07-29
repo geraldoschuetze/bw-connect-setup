@@ -10,7 +10,8 @@ No copy/pasting tokens, no password in your shell history, no secret written to 
 $ bw-connect
 ? Master password: [hidden]
 ✅ Bitwarden conectado
-   Sessão: /run/user/1000/bw_session
+   Sessão:    /run/user/1000/bw_session
+   Auto-lock: em 3h
 ```
 
 > ℹ️ The script's own messages are in Portuguese. This README quotes them verbatim so that what you see in the terminal matches what you read here.
@@ -43,16 +44,10 @@ bw unlock
 
 ## ⚙️ How it works
 
-```
-┌─────────────┐   password (hidden prompt)  ┌──────────────┐
-│  bw-connect │ ──────────────────────────► │  bw unlock   │
-└─────────────┘                             │    --raw     │
-       │                                    └──────┬───────┘
-       │              session token                │
-       │ ◄─────────────────────────────────────────┘
-       ▼
-  $XDG_RUNTIME_DIR/bw_session  (chmod 600, inside a drwx------ directory)
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/bwflow-dark.svg">
+  <img alt="What one bw-connect does: install.sh puts the script on your PATH and bw login runs once per machine; every unlock then checks bw status, runs bw unlock --raw behind a hidden prompt, and writes the token atomically under umask 077 into $XDG_RUNTIME_DIR/bw_session with mode 600, ready for your shells and Claude Code." src="docs/img/bwflow-light.svg" width="100%">
+</picture>
 
 Step by step through the script ([`bw-connect`](bw-connect)):
 
@@ -187,6 +182,12 @@ BW_SESSION=$(cat "$(bw-connect --path)") bw get password "item-name"
 If the vault locks in the middle of a Claude session, run `! bw-connect` straight from Claude's prompt — the `!` runs the command in your terminal and shows the result in the conversation.
 
 ## 🔒 Security
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/bwlife-dark.svg">
+  <img alt="The session's life: the token sits in $XDG_RUNTIME_DIR/bw_session with mode 600, guarded by umask 077, an atomic write, a private drwx------ directory and the removal of the previous session when an unlock fails; it ends through auto-lock, an explicit bw lock, or logout. While it is live, any process running as your user can read the whole vault." src="docs/img/bwlife-light.svg" width="100%">
+</picture>
+
 
 **How the script protects your credentials:**
 
